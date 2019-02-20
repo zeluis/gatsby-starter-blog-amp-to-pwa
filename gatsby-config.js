@@ -1,9 +1,9 @@
 module.exports = {
   siteMetadata: {
     title: `Gatsby Starter Blog`,
-    author: `Kyle Mathews`,
+    author: `Tomoyuki Kashiro`,
     description: `A starter blog demonstrating what Gatsby can do.`,
-    siteUrl: `https://gatsby-starter-blog-demo.netlify.com/`,
+    siteUrl: `https://gatsby-starter-blog-amp-to-pwa.netlify.com/`,
     social: {
       twitter: `kylemathews`,
     },
@@ -112,7 +112,12 @@ module.exports = {
       options: {
         files: ['posts/**/index.html', 'index.html'],
         gaConfigPath: 'gaConfig.json',
-        dist: 'public/amp'
+        dist: 'public/amp',
+        serviceWorker: {
+          src: 'https://gatsby-starter-blog-amp-to-pwa.netlify.com/sw.js',
+          'data-iframe-src': 'https://gatsby-starter-blog-amp-to-pwa.netlify.com/amp-install-serviceworker.html',
+          layout: 'nodisplay'
+        }
       }
     },
     `gatsby-plugin-offline`,
