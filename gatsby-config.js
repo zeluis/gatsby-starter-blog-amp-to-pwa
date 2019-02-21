@@ -1,9 +1,9 @@
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Starter Blog`,
-    author: `Kyle Mathews`,
-    description: `A starter blog demonstrating what Gatsby can do.`,
-    siteUrl: `https://gatsby-starter-blog-demo.netlify.com/`,
+    title: `Gatsby Starter Blog (AMP to PWA)`,
+    author: `Tomoyuki Kashiro`,
+    description: `A starter blog (AMP to PWA) demonstrating what Gatsby can do.`,
+    siteUrl: `https://gatsby-starter-blog-amp-to-pwa.netlify.com/`,
     social: {
       twitter: `kylemathews`,
     },
@@ -53,7 +53,48 @@ module.exports = {
         //trackingId: `ADD YOUR TRACKING ID HERE`,
       },
     },
-    `gatsby-plugin-feed`,
+    {
+      resolve: `gatsby-plugin-feed`,
+      options: {
+        feeds: [
+          {
+            serialize: ({ query: { site, allMarkdownRemark } }) => {
+              return allMarkdownRemark.edges.map(edge => {
+                return Object.assign({}, edge.node.frontmatter, {
+                  description: edge.node.excerpt,
+                  date: edge.node.frontmatter.date,
+                  url: site.siteMetadata.siteUrl + 'posts' + edge.node.fields.slug,
+                  guid: site.siteMetadata.siteUrl + 'posts' + edge.node.fields.slug,
+                  custom_elements: [{ "content:encoded": edge.node.html }],
+                })
+              })
+            },
+            query: `
+            {
+              allMarkdownRemark(
+                limit: 1000,
+                sort: { order: DESC, fields: [frontmatter___date] }
+              ) {
+                edges {
+                  node {
+                    excerpt
+                    html
+                    fields { slug }
+                    frontmatter {
+                      title
+                      date
+                    }
+                  }
+                }
+              }
+            }
+          `,
+            output: "/rss.xml",
+            title: "Gatsby RSS Feed",
+          }
+        ]
+      }
+    },
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
@@ -65,6 +106,19 @@ module.exports = {
         display: `minimal-ui`,
         icon: `content/assets/gatsby-icon.png`,
       },
+    },
+    {
+      resolve: 'gatsby-plugin-html2amp',
+      options: {
+        files: ['posts/**/index.html', 'index.html'],
+        gaConfigPath: 'gaConfig.json',
+        dist: 'public/amp',
+        serviceWorker: {
+          src: 'https://gatsby-starter-blog-amp-to-pwa.netlify.com/sw.js',
+          'data-iframe-src': 'https://gatsby-starter-blog-amp-to-pwa.netlify.com/amp-install-serviceworker.html',
+          layout: 'nodisplay'
+        }
+      }
     },
     `gatsby-plugin-offline`,
     `gatsby-plugin-react-helmet`,
